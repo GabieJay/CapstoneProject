@@ -442,19 +442,17 @@ myApp.controller('switchController', ['$scope', '$rootScope', function ($scope, 
 		//Gabie 
 		var ingressMulticastData = [];
 		var egressMulticastData = [];
-		//Gabie Errors
-		var ingressPauseData = [];
-		var ingressUndersizeData = [];
-		var ingressFragmentsData = [];
-		var ingressOversizeData = [];
-		var ingressJabberData = [];
-		var ingressRxErrData = [];
-		var ingressFcsErrData = [];
 		
-		var egressPauseData = [];
-		var egressExcessiveData = [];
-		var egressCollisionsData = [];
-		var egressOtherData = [];
+		//Nicole broadcast
+		var ingressBroadcastData = [];
+		var egressBroadcastData = [];
+		
+		//Nicole unicast
+		var ingressUnicastData = [];
+		var egressUnicastData = [];
+		
+		var ingressBandwidthData = [];
+		var egressBandwidthData = [];
 
         //move this logic into core library?
         for (var i = 1; i < messageCount - 1; i++) {
@@ -466,21 +464,23 @@ myApp.controller('switchController', ['$scope', '$rootScope', function ($scope, 
 			//Gabie
 			var ingressMulticastTotal = 0;
 			var egressMulticastTotal = 0;
-			//Gabie Errors
-	/*		var ingressPauseTotal = 0;
-			var ingressUndersizeTotal = 0;
-			var ingressFragmentsTotal = 0;
-			var ingressOversizeTotal = 0;
-			var ingressJabberTotal = 0;
-			var ingressRxErrTotal = 0;
-			var ingressFcsErrTotal = 0;
 			
-			var egressPauseTotal = 0;
-			var egressExcessiveTotal = 0;
-			var egressCollisionsTotal = 0;
-			var egressOtherTotal = 0;
-*/
-
+			//Nicole broadcast
+			var ingressBroadcastTotal = 0;
+			var egressBroadcastTotal = 0;
+			//Nicole unicast
+			var ingressUnicastTotal = 0;
+			var egressUnicastTotal = 0;
+			
+			var firstIngressBandwidth = 0;
+			var firstEgressBandwidth = 0;
+			
+			var secondIngressBandwidth = 0;
+			var secondEgressBandwidth = 0;
+			
+			var ingressBandwidth = 0;
+			var egressBandwidth = 0;
+			
             for (var j = 0; j < dataItems.length - 1; j++) {
                 ingressByteTotal += parseInt(dataItems[j].IngressBytes);
                 egressByteTotal += parseInt(dataItems[j].EgressBytes);
@@ -488,40 +488,45 @@ myApp.controller('switchController', ['$scope', '$rootScope', function ($scope, 
 				//Gabie
 				ingressMulticastTotal += parseInt(dataItems[j].IngressMulticast);
 				egressMulticastTotal += parseInt(dataItems[j].EgressMulticast);
-				//Gabie Errors
-			/*	if(parseInt(dataItems[j].IngressPause) > 0){
-					ingressPauseTotal += 1;
+				
+				//Nicole broadcast
+				ingressBroadcastTotal += parseInt(dataItems[j].IngressBroadcast);
+				egressBroadcastTotal += parseInt(dataItems[j].EgressBroadcast);
+				//Nicole unicast
+				ingressUnicastTotal += parseInt(dataItems[j].IngressUnicast);
+				egressUnicastTotal += parseInt(dataItems[j].EgressUnicast);
+				
+				if(j == 0){
+					ingressBandwidth = 0;
+					egressBandwidth = 0;
 				}
-				if(parseInt(dataItems[j].IngressUndersize) > 0){
-					ingressUndersizeTotal =+ 1;
+				else{
+					firstIngressBandwidth = parseInt(dataItems[j-1].IngressBytes);
+					secondIngressBandwidth = parseInt(dataItems[j].IngressBytes);
+					firstEgressBandwidth = parseInt(dataItems[j-1].EgressBytes);
+					secondEgressBandwidth = parseInt(dataItems[j].EgressBytes);
 				}
-				if(parseInt(dataItems[j].IngressFragments) > 0){
-					ingressFragmentsTotal += 1;
+				/*if(firstIngressBandwidth > secondIngressBandwidth){
+					ingressBandwidth = firstIngressBandwidth - secondIngressBandwidth;
+				}else{
+					ingressBandwidth = secondIngressBandwidth - firstIngressBandwidth;
+				}		
+				if(firstEgressBandwidth > secondEgressBandwidth){
+					egressBandwidth = firstEgressBandwidth - secondEgressBandwidth;
+				}else{
+					egressBandwidth = secondEgressBandwidth - firstEgressBandwidth;
 				}
-				if(parseInt(dataItems[j].IngressOversize) > 0){
-					ingressOversizeTotal += 1;
+			*/	ingressBandwidth = Math.abs((secondIngressBandwidth - firstIngressBandwidth));
+				egressBandwidth = Math.abs((secondEgressBandwidth - firstEgressBandwidth));
+				if(ingressBandwidth < 0){
+					ingressBandwidth *= (-1);
 				}
-				if(parseInt(dataItems[j].IngressJabber) > 0){
-					ingressJabberTotal += 1;
+				if(egressBandwidth < 0){
+					egressBandwidth *= (-1);
 				}
-				if(parseInt(dataItems[j].IngressRxErr) > 0){
-					ingressRxErrTotal += 1;
-				}
-				if(parseInt(dataItems[j].IngressFscErr) > 0){
-					ingressFcsErrTotal += 1;
-				}
-				if(parseInt(dataItems[j].EgressPause) > 0){
-					egressPauseTotal += 1;
-				}
-				if(parseInt(dataItems[j].EgressExcessive) > 0){
-					egressExcessiveTotal += 1;
-				}
-				if(parseInt(dataItems[j].EgressCollisions) > 0){
-					egressCollisionsTotal += 1;
-				}
-				if(parseInt(dataItems[j].EgressOther) > 0){
-					egressOtherTotal += 1;
-				}*/
+				
+				ingressBandwidthData.push(ingressBandwidth);
+				egressBandwidthData.push(egressBandwidth);
             }
             ingressByteData.push(ingressByteTotal);
             egressByteData.push(egressByteTotal);
@@ -531,20 +536,12 @@ myApp.controller('switchController', ['$scope', '$rootScope', function ($scope, 
 			ingressMulticastData.push(ingressMulticastTotal);
 			egressMulticastData.push(egressMulticastTotal);
 			
-			/*ingressPauseData.push(ingressPauseTotal);
-			ingressUndersizeData.push(ingressUndersizeTotal);
-			ingressFragmentsData.push(ingressFragmentsTotal);
-			ingressOversizeData.push(ingressOversizeTotal);
-			ingressJabberData.push(ingressJabberTotal);
-			ingressRxErrData.push(ingressRxErrTotal);
-			ingresFcsErrData.push(ingressFcsErrTotal);
-			
-			egressPauseData.push(egressPauseTotal);
-			egressExcessiveData.push(egressExcessiveTotal);
-			egressCollisionsData.push(egressCollisionsTotal);
-			egressOtherData.push(egressOtherTotal);
-		*/
-
+			//Nicole broadcast
+			ingressBroadcastData.push(ingressBroadcastTotal);
+			egressBroadcastData.push(egressBroadcastTotal);
+			//Nicole unicast
+			ingressUnicastData.push(ingressUnicastTotal);
+			egressUnicastData.push(egressUnicastTotal);
         }
 
         //fill series data;
@@ -564,46 +561,34 @@ myApp.controller('switchController', ['$scope', '$rootScope', function ($scope, 
 			name: 'Egress',
 			data: egressMulticastData
 		}];
-//Gabie Errors
-	/*	var errorsSeries = [{
-			name: 'Ingress Pause',
-			data: ingressPauseData
-		},{
-			name: 'Ingress Undersize',
-			data: ingressUndersizeData
-		},{
-			name: 'Ingress Fragments',
-			data: ingressFragmentsData
-		},{
-			name: 'Ingress Oversize',
-			data: ingressOversizeData
-		},{
-			name: 'Ingress Jabber',
-			data: ingressJabberData
-		},{
-			name: 'Ingress RxErr',
-			data: ingressRxErrData
-		},{
-			name: 'Ingress FcsErr',
-			data: ingresFcsErrData
-		},{ 
-			name: 'Egress Pause',
-			data: egressPauseData
-		},{
-			name: 'Egress Excessive',
-			data: egressExcessiveData
-		},{
-			name: 'Egress Collisions'
-			data: egressCollisionsData
-		},{
-			name: 'Egress Other',
-			data: egressOtherData
-		}];
-*/
 
+		//Nicole broadcast series
+		var broadcastSeries = [{
+			name: 'Ingress',
+			data: ingressBroadcastData
+		},{
+			name: 'Egress',
+			data: egressBroadcastData
+		}];
+		//Nicole unicast series
+		var unicastSeries = [{
+			name: 'Ingress',
+			data: ingressUnicastData
+		}, {
+			name: 'Egress',
+			data: egressUnicastData
+		}];
+		var bandwidthSeries = [{
+			name: 'Ingress',
+			data: ingressBandwidthData
+		}, {
+			name: 'Egress',
+			data: egressBandwidthData
+		}];
         //does not separate presentation code from logic and data. need to write a directive for this
         var bytesChart =
 		{
+			
 			chart: {
 				type: 'line',
 				zoomType: 'x'
@@ -657,7 +642,11 @@ myApp.controller('switchController', ['$scope', '$rootScope', function ($scope, 
 		//Multicast Chart
 		var multicastChart =
 		{
-		    title:
+		    chart: {
+				type: 'line',
+				zoomType: 'x'
+            },
+			title:
 			{
 			    text: 'Multicast',
 			    x: -20 //center
@@ -702,47 +691,166 @@ myApp.controller('switchController', ['$scope', '$rootScope', function ($scope, 
 		    series: multicastSeries
 		};
 		
-		//Errors Chart
-	/*	var errorsChart =
+		//Nicole
+		//Broadcast Chart
+		var broadcastChart =
 		{
-			chart:{
-				type: 'column'
+		    chart: {
+				type: 'line',
+				zoomType: 'x'
+            },
+			title:
+			{
+			    text: 'Broadcast',
+			    x: -20 //center
 			},
-			title: {
-				text: 'Errors'
+		    credits: {
+		        enabled: false
+		    },
+		    rangeSelector: {
+		        enabled: false //can probably use this in the future
+		    },
+		    xAxis:
+			{
+			    title:
+				{
+				    text: 'Elapsed Time (mins)'
+				},
+			    labels: {
+			        formatter: function () {
+			            return (this.value * 2);
+			        }
+			    }
 			},
-			xAxis:{
-				min: 0,
-				title: {
-					text:'Type of Error'
-					}
-			},
-			yAxis: {
-				min: 0,
-				title: {
-					text: 'Number of Errors'
-				}
-			},
-			tooltip: {
-			headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true	
-			},
-			plotOptions: {
-				column: {
-					pointPadding: 0.2,
-					borderWidth : 0
-				}
-			},
-			series: errorsSeries
+		    yAxis: {
+		        title:
+				{
+				    text: 'Broadcast'
+				},
+		        plotLines: [{
+		            value: 0,
+		            width: 2,
+		            color: 'silver'
+		        }]
+		    },
+		    plotOptions: {
+		        series: {
+		            compare: 'value'
+		        }
+		    },
+		    tooltip: {
+		        pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>'
+		    },
+		    series: broadcastSeries
 		};
-		*/
+		
+		//Nicole
+		//Unicast Chart
+		var unicastChart =
+		{
+		    chart: {
+				type: 'line',
+				zoomType: 'x'
+            },
+			title:
+			{
+			    text: 'Unicast',
+			    x: -20 //center
+			},
+		    credits: {
+		        enabled: false
+		    },
+		    rangeSelector: {
+		        enabled: false //can probably use this in the future
+		    },
+		    xAxis:
+			{
+			    title:
+				{
+				    text: 'Elapsed Time (mins)'
+				},
+			    labels: {
+			        formatter: function () {
+			            return (this.value * 2);
+			        }
+			    }
+			},
+		    yAxis: {
+		        title:
+				{
+				    text: 'Unicast'
+				},
+		        plotLines: [{
+		            value: 0,
+		            width: 2,
+		            color: 'silver'
+		        }]
+		    },
+		    plotOptions: {
+		        series: {
+		            compare: 'value'
+		        }
+		    },
+		    tooltip: {
+		        pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>'
+		    },
+		    series: unicastSeries
+		};
+		var bandwidthChart =
+		{
+			chart: {
+				type: 'line',
+				zoomType: 'x'
+            },
+		    title:
+			{
+			    text: 'Bandwidth',
+			    x: -20 //center
+			},
+		    credits: {
+		        enabled: false
+		    },
+		    rangeSelector: {
+		        enabled: false //can probably use this in the future
+		    },
+		    xAxis:
+			{
+			    title:
+				{
+				    text: 'Elapsed Time (mins)'
+				},
+			    labels: {
+			        formatter: function () {
+			            return (this.value * 2);
+			        }
+			    }
+			},
+		    yAxis: {
+		        title:
+				{
+				    text: 'Bandwidth'
+				},
+		        plotLines: [{
+		            value: 0,
+		            width: 2,
+		            color: 'silver'
+		        }]
+		    },
+		    plotOptions: {
+		        series: {
+		            compare: 'value'
+		        }
+		    },
+		    tooltip: {
+		        pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>'
+		    },
+		    series: bandwidthSeries
+		};
 		Highcharts.chart('bytesChart', bytesChart);
 		Highcharts.chart('multicastChart', multicastChart);
-		//Highcharts.chart('errorsChart', errorsChart);
+		Highcharts.chart('broadcastChart', broadcastChart);
+		Highcharts.chart('unicastChart', unicastChart);
+		Highcharts.chart('bandwidthChart', bandwidthChart);
     }
 
 
